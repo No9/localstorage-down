@@ -7,7 +7,7 @@ var noop = function () {
 };
 var nextTick = global.setImmediate || process.nextTick;
 
-function LDIterator(db, options) {
+function KeyValueIterator(db, options) {
 
   AbstractIterator.call(this, db);
 
@@ -37,9 +37,9 @@ function LDIterator(db, options) {
   }
 }
 
-util.inherits(LDIterator, AbstractIterator);
+util.inherits(KeyValueIterator, AbstractIterator);
 
-LDIterator.prototype._next = function (callback) {
+KeyValueIterator.prototype._next = function (callback) {
 
   if (this._pos >= this.db.container.length() || this._pos < 0) {
     return nextTick(callback);
@@ -67,24 +67,24 @@ LDIterator.prototype._next = function (callback) {
   nextTick(function () { callback(null, key, value); });
 };
 
-function LD(location) {
-  if (!(this instanceof LD)) {
-    return new LD(location);
+function AbstractKeyValueDown(location) {
+  if (!(this instanceof AbstractKeyValueDown)) {
+    return new AbstractKeyValueDown(location);
   }
   AbstractLevelDOWN.call(this, location);
-  var Wstore = require('./localstorage').LocalStorage;
+  var Wstore = require('./store');
   this.container = new Wstore(location);
 }
 
-util.inherits(LD, AbstractLevelDOWN);
+util.inherits(AbstractKeyValueDown, AbstractLevelDOWN);
 
-LD.prototype._open = function (options, callback) {
+AbstractKeyValueDown.prototype._open = function (options, callback) {
   nextTick(function () {
     callback(null, this);
   }.bind(this));
 };
 
-LD.prototype._put = function (key, value, options, callback) {
+AbstractKeyValueDown.prototype._put = function (key, value, options, callback) {
 
   var err = checkKeyValue(key, 'key');
 
@@ -105,11 +105,10 @@ LD.prototype._put = function (key, value, options, callback) {
     value = JSON.stringify(obj);
   }
 
-  this.container.setItem(key, value);
-  nextTick(callback);
+  this.container.setItem(key, value, callback);
 };
 
-LD.prototype._get = function (key, options, callback) {
+AbstractKeyValueDown.prototype._get = function (key, options, callback) {
 
   var err = checkKeyValue(key, 'key');
 
@@ -147,7 +146,7 @@ LD.prototype._get = function (key, options, callback) {
   });
 };
 
-LD.prototype._del = function (key, options, callback) {
+AbstractKeyValueDown.prototype._del = function (key, options, callback) {
 
   var err = checkKeyValue(key, 'key');
 
@@ -162,7 +161,7 @@ LD.prototype._del = function (key, options, callback) {
   nextTick(callback);
 };
 
-LD.prototype._batch = function (array, options, callback) {
+AbstractKeyValueDown.prototype._batch = function (array, options, callback) {
   var err;
   var i = 0;
   var key;
@@ -191,11 +190,11 @@ LD.prototype._batch = function (array, options, callback) {
   nextTick(callback);
 };
 
-LD.prototype._iterator = function (options) {
-  return new LDIterator(this, options);
+AbstractKeyValueDown.prototype._iterator = function (options) {
+  return new KeyValueIterator(this, options);
 };
 
-LD.destroy = function (name, callback) {
+AbstractKeyValueDown.destroy = function (name, callback) {
   try {
     Object.keys(localStorage)
       .forEach(function (key) {
@@ -246,4 +245,4 @@ function checkKeyValue(obj, type) {
 }
 
 
-module.exports = LD;
+module.exports = AbstractKeyValueDown;
