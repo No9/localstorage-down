@@ -58,6 +58,12 @@ LocalStorage.prototype.setItem = function (key, value) {
 LocalStorage.prototype.getItem = function (key) {
   var value;
 
+  // check the array first, for better performance
+  var idx = utils.sortedIndexOf(this._keys, key);
+  if (this._keys[idx] !== key) {
+    return undefined;
+  }
+
   var retval = window.localStorage.getItem(this._prefix + key);
   if (retval == null) {
     return undefined;
