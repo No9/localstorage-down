@@ -131,7 +131,7 @@ LD.prototype._get = function (key, options, callback) {
 
 
   if (options.asBuffer !== false && !Buffer.isBuffer(value)) {
-    value = new Buffer(String(value));
+    value = new Buffer(value);
   }
 
 
