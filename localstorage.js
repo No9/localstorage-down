@@ -1,5 +1,6 @@
 'use strict';
 
+var BloomFilter = require('bloomfilter').BloomFilter;
 var arrayBuffPrefix = 'ArrayBuffer:';
 var arrayBuffRegex = new RegExp('^' + arrayBuffPrefix);
 var uintPrefix = 'Uint8Array:';
@@ -10,6 +11,10 @@ var utils = require('./utils');
 function LocalStorage(dbname) {
   this._keys = [];
   this._prefix = dbname + '!';
+  this._bloom = new BloomFilter(
+      32 * 256, // number of bits to allocate.
+      16        // number of hash functions.
+  );
 
   var prefixLen = this._prefix.length;
   var i = -1;
@@ -50,6 +55,7 @@ LocalStorage.prototype.setItem = function (key, value) {
   var idx = utils.sortedIndexOf(this._keys, key);
   if (this._keys[idx] !== key) {
     this._keys.splice(idx, 0, key);
+    this._bloom.add(key);
   }
   window.localStorage.setItem(this._prefix + key, value);
 };
@@ -57,6 +63,10 @@ LocalStorage.prototype.setItem = function (key, value) {
 //getItem: Returns the item identified by it's key.
 LocalStorage.prototype.getItem = function (key) {
   var value;
+  
+  if (!this._bloom.test(key)) {
+    return undefined;
+  }
 
   var retval = window.localStorage.getItem(this._prefix + key);
   if (retval == null) {
