@@ -7,6 +7,8 @@ var noop = function () {
 };
 var nextTick = global.setImmediate || process.nextTick;
 
+require('./typed-array-shim');
+
 function LDIterator(db, options) {
 
   AbstractIterator.call(this, db);

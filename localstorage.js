@@ -35,7 +35,7 @@ LocalStorage.prototype.key = function (keyindex) {
 
 // returns the key index if found, else the index where
 // the key should be inserted
-LocalStorage.prototype.indexOfKey = function(key) {
+LocalStorage.prototype.indexOfKey = function (key) {
   return utils.sortedIndexOf(this._keys, key);
 };
 
