@@ -6,6 +6,7 @@ var AbstractIterator = require('abstract-leveldown').AbstractIterator;
 
 var LocalStorage = require('./localstorage').LocalStorage;
 var LocalStorageCore = require('./localstorage-core');
+var utils = require('./utils');
 
 // see http://stackoverflow.com/a/15349865/680742
 var nextTick = global.setImmediate || process.nextTick;
@@ -15,20 +16,63 @@ function LDIterator(db, options) {
   AbstractIterator.call(this, db);
 
   this._reverse = !!options.reverse;
-  this._endkey     = options.end;
-  this._startkey   = options.start;
-  this._gt      = options.gt;
-  this._gte     = options.gte;
-  this._lt      = options.lt;
-  this._lte     = options.lte;
-  this._exclusiveStart = options.exclusiveStart;
-  this._limit = options.limit;
+
+  if ('start' in options || 'end' in options) {
+    // translate the old system to the new system
+    if ('start' in options) {
+      if (this._reverse) {
+        if (options.exclusiveStart) {
+          this._lt = options.start;
+        } else {
+          this._lte = options.start;
+        }
+      } else {
+        if (options.exclusiveStart) {
+          this._gt = options.start;
+        } else {
+          this._gte = options.start;
+        }
+      }
+    }
+    if ('end' in options) {
+      if (this._reverse) {
+        this._gte = options.end;
+      } else {
+        this._lte = options.end;
+      }
+    }
+  } else {
+    // just use the new system
+    this._gt      = options.gt && String(options.gt);
+    this._gte     = options.gte && String(options.gte);
+    this._lt      = options.lt && String(options.lt);
+    this._lte     = options.lte && String(options.lte);
+  }
+  this._limit   = options.limit;
+  this._keyAsBuffer = 'keyAsBuffer' in options ? !!options.keyAsBuffer : true;
+  this._valueAsBuffer = 'valueAsBuffer' in options ? !!options.valueAsBuffer: true;
   this._count = 0;
 
   this.onInitCompleteListeners = [];
 }
 
 inherits(LDIterator, AbstractIterator);
+
+LDIterator.prototype._getStartKey = function () {
+  if (this._reverse) {
+    if (typeof this._lt !== 'undefined') {
+      return this._lt;
+    } else if (typeof this._lte !== 'undefined') {
+      return this._lte;
+    }
+  } else {
+    if (typeof this._gt !== 'undefined') {
+      return this._gt;
+    } else if (typeof this._gte !== 'undefined') {
+      return this._gte;
+    }
+  }
+};
 
 LDIterator.prototype._init = function (callback) {
   var self = this;
@@ -37,19 +81,25 @@ LDIterator.prototype._init = function (callback) {
       return callback(err);
     }
 
-    if (self._startkey) {
-      self.db.container.binarySearch(self._startkey, function (err, res) {
+    var startkey = self._getStartKey();
+
+    if (typeof startkey !== 'undefined') {
+      self.db.container.binarySearch(startkey, function (err, res) {
         if (err) {
           return callback(err);
         }
         self._pos = res.index;
-        var startkey = res.key;
+        var key = res.key;
         if (self._reverse) {
-          if (self._exclusiveStart || startkey !== self._startkey) {
+          if (typeof self._lte !== 'undefined' && self._lte !== key) {
+            self._pos--;
+          } else if (typeof self._lt !== 'undefined' && self._lt <= key) {
             self._pos--;
           }
-        } else if (self._exclusiveStart && startkey === self._startkey) {
-          self._pos++;
+        } else {
+          if (typeof self._gt !== 'undefined' && self._gt === key) {
+            self._pos++;
+          }
         }
         callback();
       });
@@ -73,11 +123,7 @@ LDIterator.prototype._next = function (callback) {
         return callback();
       }
 
-      if (!!self._endkey && (self._reverse ? key < self._endkey : key > self._endkey)) {
-        return callback();
-      }
-
-      if (!!self._limit && self._limit > 0 && self._count++ >= self._limit) {
+      if (typeof self._limit === 'number' && self._limit > -1 && self._count++ >= self._limit) {
         return callback();
       }
 
@@ -90,14 +136,15 @@ LDIterator.prototype._next = function (callback) {
 
       self._pos += self._reverse ? -1 : 1;
 
-      self.db.container.getItem(key, function (err, value) {
+      self.db.container.getItem(key, self._valueAsBuffer, function (err, value) {
         if (err) {
           if (err.message === 'NotFound') {
             return callback();
           }
           return callback(err);
         }
-        callback(null, key, value);
+        var keyToReturn = self._keyAsBuffer ? new Buffer(key) : key;
+        callback(null, keyToReturn, value);
       });
     });
   }
@@ -156,13 +203,6 @@ LD.prototype._put = function (key, value, options, callback) {
     });
   }
 
-  if (typeof value === 'object' && !Buffer.isBuffer(value) && value.buffer === undefined) {
-    var obj = {};
-    obj.storetype = "json";
-    obj.data = value;
-    value = JSON.stringify(obj);
-  }
-
   this.container.setItem(key, value, callback);
 };
 
@@ -176,25 +216,11 @@ LD.prototype._get = function (key, options, callback) {
     });
   }
 
-  if (!Buffer.isBuffer(key)) {
-    key = String(key);
-  }
-  this.container.getItem(key, function (err, value) {
+  var asBuffer = 'asBuffer' in options ? !!options.asBuffer : true;
 
+  this.container.getItem(key, asBuffer, function (err, value) {
     if (err) {
       return callback(err);
-    }
-
-    if (options.asBuffer !== false && !Buffer.isBuffer(value)) {
-      value = new Buffer(value);
-    }
-
-
-    if (options.asBuffer === false) {
-      if (value.indexOf("{\"storetype\":\"json\",\"data\"") > -1) {
-        var res = JSON.parse(value);
-        value = res.data;
-      }
     }
     callback(null, value);
   });
@@ -209,10 +235,6 @@ LD.prototype._del = function (key, options, callback) {
       callback(err);
     });
   }
-  if (!Buffer.isBuffer(key)) {
-    key = String(key);
-  }
-
   this.container.removeItem(key, callback);
 };
 
@@ -231,11 +253,11 @@ LD.prototype._batch = function (array, options, callback) {
       }
     }
 
-    if (Array.isArray(array) && array.length) {
+    if (utils.isArray(array) && array.length) {
       for (var i = 0; i < array.length; i++) {
         var task = array[i];
         if (task) {
-          key = Buffer.isBuffer(task.key) ? task.key : String(task.key);
+          key = task.key;
           err = checkKeyValue(key, 'key');
           if (err) {
             overallErr = err;
@@ -243,7 +265,7 @@ LD.prototype._batch = function (array, options, callback) {
           } else if (task.type === 'del') {
             self._del(task.key, options, checkDone);
           } else if (task.type === 'put') {
-            value = Buffer.isBuffer(task.value) ? task.value : String(task.value);
+            value = task.value;
             err = checkKeyValue(value, 'value');
             if (err) {
               overallErr = err;
@@ -271,25 +293,15 @@ LD.destroy = function (name, callback) {
 };
 
 function checkKeyValue(obj, type) {
-  if (obj === null || obj === undefined) {
-    return new Error(type + ' cannot be `null` or `undefined`');
-  }
-  if (obj === null || obj === undefined) {
-    return new Error(type + ' cannot be `null` or `undefined`');
-  }
-
   if (type === 'key') {
-
+    if (obj === null || obj === undefined) {
+      return new Error(type + ' cannot be `null` or `undefined`');
+    }
     if (obj instanceof Boolean) {
       return new Error(type + ' cannot be `null` or `undefined`');
     }
     if (obj === '') {
       return new Error(type + ' cannot be empty');
-    }
-  }
-  if (obj.toString().indexOf("[object ArrayBuffer]") === 0) {
-    if (obj.byteLength === 0 || obj.byteLength === undefined) {
-      return new Error(type + ' cannot be an empty Buffer');
     }
   }
 
