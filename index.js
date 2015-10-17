@@ -39,6 +39,7 @@ LDIterator.prototype._init = function (callback) {
 
 LDIterator.prototype._next = function (callback) {
   var self = this;
+  callback = asyncify(callback);
 
   function onInitComplete() {
     if (self._pos === self._keys.length || self._pos < 0) { // done reading
@@ -295,5 +296,21 @@ function checkKeyValue(obj, type) {
   }
 }
 
+function asyncify (fn) {
+  if (fn._isAsync) {
+    return fn;
+  }
+
+  var ret = function () {
+    var ctx = this;
+    var args = arguments;
+    nextTick(function () {
+      fn.apply(ctx, args);
+    });
+  };
+
+  ret._isAsync = true;
+  return ret;
+}
 
 module.exports = LD;
