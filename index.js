@@ -23,6 +23,7 @@ function LDIterator(db, options) {
   this._lt      = options.lt;
   this._lte     = options.lte;
   this._exclusiveStart = options.exclusiveStart;
+  this._keysOnly = options.values === false;
   this._limit = options.limit;
   this._count = 0;
 
@@ -63,6 +64,10 @@ LDIterator.prototype._next = function (callback) {
     }
 
     self._pos += self._reverse ? -1 : 1;
+    if (self._keysOnly) {
+      return callback(null, key);
+    }
+
     self.db.container.getItem(key, function (err, value) {
       if (err) {
         if (err.message === 'NotFound') {
