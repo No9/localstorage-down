@@ -1,5 +1,7 @@
 'use strict';
 
+var storage = require('humble-localstorage');
+
 var dbidx = 0;
 var theLocation = function () {
   return '_leveldown_test_db_' + dbidx++;
@@ -10,10 +12,7 @@ var lastLocation = function () {
 };
 
 var cleanup = function (callback) {
-
-  if (window.localStorage) {
-    window.localStorage.clear();
-  }
+  storage.clear();
 
   return callback();
 };

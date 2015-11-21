@@ -12,10 +12,6 @@ The scenarios envisaged are :
 
 This project is intended for use with the [level eco-system](https://github.com/level/).
 
-## Status 
-
-[![browser support](https://ci.testling.com/no9/localstorage-down.png)](https://ci.testling.com/no9/localstorage-down)
-
 ## Install
 
 ```
@@ -28,6 +24,18 @@ Basically we support [any browser that has localStorage](http://caniuse.com/name
 
 * [typedarray](https://github.com/substack/typedarray) for binary storage
 * [es5-shim](https://github.com/es-shims/es5-shim) for just about everything
+
+We run automated tests in the following browsers:
+
+* **Android**: 4.0-5.1
+* **Firefox**: 38-42
+* **Chrome**: 42-beta
+* **IE**: 8-11
+* **iPhone**: 8.0-9.1
+* **Safari**: 7.1-9
+
+In environments without LocalStorage, such as Node or Safari private browsing, this module
+will fall back to a temporary in-memory implementation, thanks to [humble-localstorage](https://www.npmjs.com/package/humble-localstorage).
 
 ## Example 
 
@@ -89,8 +97,19 @@ http://www.youtube.com/watch?v=ExUosomc8Uc
 npm run test
 ```
 
-Browse to [http://localhost:9966](http://localhost:9966). 
-View console logs in the browser to see test output. 
+This will run tests in Node against `localstorage-memory`. 
+
+To test in Saucelabs, you can run e.g.:
+
+```
+BROWSER_NAME=firefox BROWSER_VERSION="38..latest" npm run test-saucelabs
+```
+
+Or to test in Zuul locally:
+
+```
+npm run test-zuul-local
+```
 
 ##  Contributors
 

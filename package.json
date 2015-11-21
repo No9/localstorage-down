@@ -18,15 +18,16 @@
     "abstract-leveldown": "0.12.3",
     "argsarray": "0.0.1",
     "d64": "^1.0.0",
+    "humble-localstorage": "^1.4.2",
     "inherits": "^2.0.1",
     "tiny-queue": "0.2.0"
   },
   "devDependencies": {
-    "beefy": "~1.1.0",
     "browserify": "^4.1.2",
+    "jshint": "^2.5.0",
     "levelup": "^0.18.2",
     "tape": "^2.12.3",
-    "jshint": "^2.5.0"
+    "zuul": "^3.7.3"
   },
   "repository": {
     "type": "git",
@@ -36,7 +37,9 @@
     "bindings": false
   },
   "scripts": {
-    "test": "npm run jshint && beefy tests/test.js",
+    "test": "npm run jshint && tape tests/*.js",
+    "test-saucelabs": "npm run jshint && zuul --ui tape --browser-name $BROWSER_NAME --browser-version $BROWSER_VERSION -- tests/*.js",
+    "test-zuul-local": "npm run jshint && zuul --ui tape --local tests/*.js",
     "jshint": "jshint -c .jshintrc *.js tests/*.js"
   },
   "testling": {

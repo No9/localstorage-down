@@ -11,6 +11,11 @@
 // see http://stackoverflow.com/a/15349865/680742
 var nextTick = global.setImmediate || process.nextTick;
 
+// We use humble-localstorage as a wrapper for localStorage because
+// it falls back to an in-memory implementation in environments without
+// localStorage, like Node or Safari private browsing.
+var storage = require('humble-localstorage');
+
 function callbackify(callback, fun) {
   var val;
   var err;
@@ -38,9 +43,9 @@ LocalStorageCore.prototype.getKeys = function (callback) {
     var keys = [];
     var prefixLen = self._prefix.length;
     var i = -1;
-    var len = window.localStorage.length;
+    var len = storage.length;
     while (++i < len) {
-      var fullKey = window.localStorage.key(i);
+      var fullKey = storage.key(i);
       if (fullKey.substring(0, prefixLen) === self._prefix) {
         keys.push(fullKey.substring(prefixLen));
       }
@@ -53,32 +58,35 @@ LocalStorageCore.prototype.getKeys = function (callback) {
 LocalStorageCore.prototype.put = function (key, value, callback) {
   var self = this;
   callbackify(callback, function () {
-    window.localStorage.setItem(self._prefix + key, value);
+    storage.setItem(self._prefix + key, value);
   });
 };
 
 LocalStorageCore.prototype.get = function (key, callback) {
   var self = this;
   callbackify(callback, function () {
-    return window.localStorage.getItem(self._prefix + key);
+    return storage.getItem(self._prefix + key);
   });
 };
 
 LocalStorageCore.prototype.remove = function (key, callback) {
   var self = this;
   callbackify(callback, function () {
-    window.localStorage.removeItem(self._prefix + key);
+    storage.removeItem(self._prefix + key);
   });
 };
 
 LocalStorageCore.destroy = function (dbname, callback) {
   var prefix = createPrefix(dbname);
   callbackify(callback, function () {
-    Object.keys(localStorage).forEach(function (key) {
-      if (key.substring(0, prefix.length) === prefix) {
-        localStorage.removeItem(key);
+    var len = storage.length;
+    var i = -1;
+    while (++i < len) {
+      var key = storage.key(i);
+      if (key && key.substring(0, prefix.length) === prefix) {
+        storage.removeItem(key);
       }
-    });
+    }
   });
 };
 
