@@ -18,7 +18,7 @@ module.exports.all = function (leveldown, tape, testCommon) {
     var db = levelup('destroy-test', {db: leveldown});
     var db2 = levelup('other-db', {db: leveldown});
     db2.put('key2', 'value2', function (err) {
-      t.notOk(err, 'no error');
+      t.notOk(err, 'no error' );
       db.put('key', 'value', function (err) {
         t.notOk(err, 'no error');
         db.get('key', function (err, value) {
