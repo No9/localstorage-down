@@ -1,10 +1,8 @@
-# localstorage-down
+# localstorage-down [![Build Status](https://travis-ci.org/No9/localstorage-down.svg)](https://travis-ci.org/No9/localstorage-down)
 
-Localstorage implementation of leveldown for mobile and desktop browsers.
+LocalStorage implementation of [leveldown](https://github.com/Level/leveldown) for mobile and desktop browsers. The idea is to be able to use the [level](http://github.com/level) stack on any browser that supports LocalStorage.
 
-The idea is to be able to use the level stack on phone and desktops.
-
-The scenarios envisaged are : 
+The scenarios envisaged are:
 
 1. Occasionally connected clients
 
@@ -20,7 +18,7 @@ npm install localstorage-down
 
 ## Browser support
 
-Basically we support [any browser that has localStorage](http://caniuse.com/namevalue-storage), but since we also rely on an ES5 environment due to dependencies from abstract-leveldown, in practice you will need the following shims in order to work correctly on all browsers (e.g. IE 8/9):
+Basically we support [any browser that has LocalStorage](http://caniuse.com/namevalue-storage), but since we also rely on an ES5 environment due to dependencies from abstract-leveldown, in practice you will need the following shims in order to work correctly on all browsers (e.g. IE 8/9):
 
 * [typedarray](https://github.com/substack/typedarray) for binary storage
 * [es5-shim](https://github.com/es-shims/es5-shim) for just about everything
