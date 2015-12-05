@@ -14,7 +14,7 @@ env:
   - COMMAND=test
   - COMMAND=test-saucelabs BROWSER_NAME=iphone BROWSER_VERSION="8.0..latest"
   - COMMAND=test-saucelabs BROWSER_NAME=safari BROWSER_VERSION="7..latest"
-  - COMMAND=test-saucelabs BROWSER_NAME=android BROWSER_VERSION="4..latest"
+  - COMMAND=test-saucelabs BROWSER_NAME=android BROWSER_VERSION="4.0..latest"
   - COMMAND=test-saucelabs BROWSER_NAME=ie BROWSER_VERSION="8..latest"
   - COMMAND=test-saucelabs BROWSER_NAME=firefox BROWSER_VERSION="38..latest"
   - COMMAND=test-saucelabs BROWSER_NAME=chrome BROWSER_VERSION="42..beta"
