@@ -38,7 +38,7 @@
   },
   "scripts": {
     "test": "npm run jshint && tape tests/*.js",
-    "test-saucelabs": "npm run jshint && zuul --ui tape --browser-name $BROWSER_NAME --browser-version $BROWSER_VERSION -- tests/*.js",
+    "test-saucelabs": "npm run jshint && zuul --ui tape --browser-name $BROWSER_NAME --browser-version $BROWSER_VERSION tests/*.js",
     "test-zuul-local": "npm run jshint && zuul --ui tape --local tests/*.js",
     "jshint": "jshint -c .jshintrc *.js tests/*.js"
   },
