@@ -39,7 +39,6 @@ LDIterator.prototype._init = function (callback) {
 
 LDIterator.prototype._next = function (callback) {
   var self = this;
-  callback = asyncify(callback);
 
   function onInitComplete() {
     if (self._pos === self._keys.length || self._pos < 0) { // done reading
@@ -77,44 +76,46 @@ LDIterator.prototype._next = function (callback) {
     });
   }
   if (!self.initStarted) {
-    self.initStarted = true;
-    self._init(function (err) {
-      if (err) {
-        return callback(err);
-      }
-      self.db.container.keys(function (err, keys) {
+    process.nextTick(function () {
+      self.initStarted = true;
+      self._init(function (err) {
         if (err) {
           return callback(err);
         }
-        self._keys = keys;
-        if (self._startkey) {
-          var index = utils.sortedIndexOf(self._keys, self._startkey);
-          var startkey = (index >= self._keys.length || index < 0) ?
-            undefined : self._keys[index];
-          self._pos = index;
-          if (self._reverse) {
-            if (self._exclusiveStart || startkey !== self._startkey) {
-              self._pos--;
-            }
-          } else if (self._exclusiveStart && startkey === self._startkey) {
-            self._pos++;
+        self.db.container.keys(function (err, keys) {
+          if (err) {
+            return callback(err);
           }
-        } else {
-          self._pos = self._reverse ? self._keys.length - 1 : 0;
-        }
-        onInitComplete();
+          self._keys = keys;
+          if (self._startkey) {
+            var index = utils.sortedIndexOf(self._keys, self._startkey);
+            var startkey = (index >= self._keys.length || index < 0) ?
+              undefined : self._keys[index];
+            self._pos = index;
+            if (self._reverse) {
+              if (self._exclusiveStart || startkey !== self._startkey) {
+                self._pos--;
+              }
+            } else if (self._exclusiveStart && startkey === self._startkey) {
+              self._pos++;
+            }
+          } else {
+            self._pos = self._reverse ? self._keys.length - 1 : 0;
+          }
+          onInitComplete();
 
-        self.initCompleted = true;
-        var i = -1;
-        while (++i < self.onInitCompleteListeners.length) {
-          nextTick(self.onInitCompleteListeners[i]);
-        }
+          self.initCompleted = true;
+          var i = -1;
+          while (++i < self.onInitCompleteListeners.length) {
+            nextTick(self.onInitCompleteListeners[i]);
+          }
+        });
       });
     });
   } else if (!self.initCompleted) {
     self.onInitCompleteListeners.push(onInitComplete);
   } else {
-    onInitComplete();
+    process.nextTick(onInitComplete);
   }
 };
 
@@ -294,23 +295,6 @@ function checkKeyValue(obj, type) {
   } else if (String(obj) === '') {
     return new Error(type + ' cannot be an empty String');
   }
-}
-
-function asyncify (fn) {
-  if (fn._isAsync) {
-    return fn;
-  }
-
-  var ret = function () {
-    var ctx = this;
-    var args = arguments;
-    nextTick(function () {
-      fn.apply(ctx, args);
-    });
-  };
-
-  ret._isAsync = true;
-  return ret;
 }
 
 module.exports = LD;
