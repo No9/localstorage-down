@@ -1,5 +1,7 @@
 'use strict';
 
+require('es5-shim');
+
 var tape   = require('tape');
 var localstorage = require('../');
 var testCommon = require('./testCommon');
