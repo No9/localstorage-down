@@ -12,6 +12,7 @@ script: npm run $COMMAND
 env:
   matrix:
   - COMMAND=test
+  - COMMAND=report-coverage
   - COMMAND=test-saucelabs BROWSER_NAME=iphone BROWSER_VERSION="8.0..latest"
   - COMMAND=test-saucelabs BROWSER_NAME=safari BROWSER_VERSION="7..latest"
   - COMMAND=test-saucelabs BROWSER_NAME=android BROWSER_VERSION="4.1..latest"

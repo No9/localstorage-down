@@ -1,4 +1,4 @@
-# localstorage-down [![Build Status](https://travis-ci.org/No9/localstorage-down.svg)](https://travis-ci.org/No9/localstorage-down)
+# localstorage-down [![Build Status](https://travis-ci.org/No9/localstorage-down.svg)](https://travis-ci.org/No9/localstorage-down) [![Coverage Status](https://coveralls.io/repos/No9/localstorage-down/badge.svg?branch=master&service=github)](https://coveralls.io/github/No9/localstorage-down?branch=master)
 
 LocalStorage implementation of [leveldown](https://github.com/Level/leveldown) for mobile and desktop browsers. The idea is to be able to use the [level](http://github.com/level) stack on any browser that supports LocalStorage.
 
@@ -98,6 +98,14 @@ To test in Saucelabs, you can run e.g.:
 Or to test in Zuul locally:
 
     npm run test-zuul-local
+
+To test and check code coverage, run:
+
+    npm run coverage
+
+To test and report code coverage to Coveralls, run:
+
+    npm run report-coverage
 
 ##  Contributors
 
