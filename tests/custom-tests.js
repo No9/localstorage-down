@@ -188,4 +188,37 @@ module.exports.all = function (leveldown, tape, testCommon) {
       });
     });
   });
+
+  tape('next() callback is dezalgofied', function (t) {
+    var db = leveldown('aaaaaa');
+    var noerr = function (err) {
+      t.error(err, 'opens crrectly');
+    };
+    var noop = function () {};
+    var iterator;
+    db.open(noerr);
+    db.put('1', '1', noop);
+    db.put('2', '2', noop);
+    iterator = db.iterator({ keyAsBuffer: false, valueAsBuffer: false, start: '1' });
+
+    var zalgoReleased = false;
+    iterator.next(function (err, key, value) {
+      zalgoReleased = true;
+      t.notOk(err, 'no error');
+      var zalgoReleased2 = false;
+      iterator.next(function (err, key, value) {
+        zalgoReleased2 = true;
+        t.notOk(err, 'no error');
+        var zalgoReleased3 = false;
+        iterator.next(function (err, key, value) {
+          zalgoReleased3 = true;
+          t.notOk(err, 'no error');
+          t.end();
+        });
+        t.ok(!zalgoReleased3, 'zalgo not released (3)');
+      });
+      t.ok(!zalgoReleased2, 'zalgo not released (2)');
+    });
+    t.ok(!zalgoReleased, 'zalgo not released (1)');
+  });
 };
