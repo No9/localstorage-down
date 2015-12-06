@@ -5,8 +5,7 @@ LocalStorage implementation of [leveldown](https://github.com/Level/leveldown) f
 The scenarios envisaged are:
 
 1. Occasionally connected clients
-
-2. Adhoc Networks where clients need to sync directly with each other.  
+2. Ad-hoc networks where clients need to sync directly with each other
 
 This project is intended for use with the [level eco-system](https://github.com/level/).
 
@@ -18,7 +17,7 @@ npm install localstorage-down
 
 ## Browser support
 
-Basically we support [any browser that has LocalStorage](http://caniuse.com/namevalue-storage), but since we also rely on an ES5 environment due to dependencies from abstract-leveldown, in practice you will need the following shims in order to work correctly on all browsers (e.g. IE 8/9):
+Basically we support [any browser that has LocalStorage](http://caniuse.com/namevalue-storage), but since we also rely on an ES5 environment due to dependencies from [abstract-leveldown](https://github.com/Level/abstract-leveldown), in practice you will need the following shims in order to work correctly on all browsers (e.g. IE 8-9, Android 2.3):
 
 * [typedarray](https://github.com/substack/typedarray) for binary storage
 * [es5-shim](https://github.com/es-shims/es5-shim) for just about everything
@@ -40,24 +39,22 @@ will fall back to a temporary in-memory implementation, thanks to [humble-locals
 
 At the command prompt in your chosen directory : 
 
-```
-npm install localstorage-down
-npm install levelup 
-npm install browserify -g
-npm install beefy -g
-```
+    npm install localstorage-down
+    npm install levelup 
+    npm install browserify -g
+    npm install beefy -g
 
-Create a file called index.js and enter the following:
+Create a file called `index.js` and enter the following:
 
-```
+```js
 var localstorage = require('localstorage-down');
 var levelup = require('levelup');
-var db = levelup('/does/not/matter', { db: localstorage });
+var db = levelup('dbname', { db: localstorage });
 
-db.put('name', 'Yuri Irsenovich Kim');
-db.put('dob', '16 February 1941');
-db.put('spouse', 'Kim Young-sook');
-db.put('occupation', 'Clown');
+db.put('name', 'James Dean');
+db.put('dob', 'February 8, 1931');
+db.put('occupation', 'Rebel');
+db.put('cause', 'none');
 
 db.readStream()
    .on('data', function (data) {
@@ -78,42 +75,33 @@ db.readStream()
 
 Publish the site :
 
-```
-beefy index.js
-```
+    beefy index.js
 
 See the output :
 
 [http://localhost:9966](http://localhost:9966)
 
-Listen to John Cage :
+Listen to John Cage:
 
 http://www.youtube.com/watch?v=ExUosomc8Uc 
 
 ## Tests
 
-```
-npm run test
-```
+    npm run test
 
 This will run tests in Node against `localstorage-memory`. 
 
 To test in Saucelabs, you can run e.g.:
 
-```
-BROWSER_NAME=firefox BROWSER_VERSION="38..latest" npm run test-saucelabs
-```
+    BROWSER_NAME=firefox BROWSER_VERSION="38..latest" npm run test-saucelabs
 
 Or to test in Zuul locally:
 
-```
-npm run test-zuul-local
-```
+    npm run test-zuul-local
 
 ##  Contributors
 
-Anton Whalley https://github.com/no9
-
-Adam Shih https://github.com/adamshih
-
-Nolan Lawson https://github.com/nolanlawson
+* [Anton Whalley](https://github.com/no9)
+* [Adam Shih](https://github.com/adamshih)
+* [Nolan Lawson](https://github.com/nolanlawson)
+* [Many more!](https://github.com/No9/localstorage-down/graphs/contributors)
