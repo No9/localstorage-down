@@ -44,6 +44,39 @@ module.exports.all = function (leveldown, tape, testCommon) {
     });
   });
 
+  tape('test .destroy with multiple dbs', function (t) {
+    var db = levelup('a', {db: leveldown});
+    var db2 = levelup('b', {db: leveldown});
+    var db3 = levelup('c', {db: leveldown});
+    db.put('1', '1', function (err) {
+      t.notOk(err, 'no error');
+      db2.put('1', '1', function (err) {
+        t.notOk(err, 'no error');
+        db3.put('1', '1', function (err) {
+          t.notOk(err, 'no error');
+          db2.put('2', '2', function (err) {
+            t.notOk(err, 'no error');
+            db2.put('3', '3', function (err) {
+              t.notOk(err, 'no error');
+              leveldown.destroy('b', function (err) {
+                t.notOk(err, 'no error');
+                db3.get('1', function (err, res) {
+                  t.notOk(err, 'no error');
+                  t.equal(res, '1');
+                  db2 = levelup('b', {db: leveldown});
+                  db2.get('3', function (err) {
+                    t.ok(err);
+                    t.end();
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+
   tape('test escaped db name', function (t) {
     var db = levelup('bang!', {db: leveldown});
     var db2 = levelup('bang!!', {db: leveldown});
