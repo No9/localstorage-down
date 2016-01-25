@@ -79,13 +79,18 @@ LocalStorageCore.prototype.remove = function (key, callback) {
 LocalStorageCore.destroy = function (dbname, callback) {
   var prefix = createPrefix(dbname);
   callbackify(callback, function () {
-    var i = storage.length;
-    while (--i >= 0) {
+    var keysToDelete = [];
+    var i = -1;
+    var len = storage.length;
+    while (++i < len) {
       var key = storage.key(i);
       if (key.substring(0, prefix.length) === prefix) {
-        storage.removeItem(key);
+        keysToDelete.push(key);
       }
     }
+    keysToDelete.forEach(function (key) {
+      storage.removeItem(key);
+    });
   });
 };
 
