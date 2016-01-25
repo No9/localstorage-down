@@ -1,6 +1,7 @@
 'use strict';
 
 var levelup = require('levelup');
+var Promise = require('lie');
   
 module.exports.setUp = function (leveldown, test, testCommon) {
   test('setUp common', testCommon.setUp);
@@ -253,5 +254,42 @@ module.exports.all = function (leveldown, tape, testCommon) {
       t.ok(!zalgoReleased2, 'zalgo not released (2)');
     });
     t.ok(!zalgoReleased, 'zalgo not released (1)');
+  });
+
+
+  tape('keys order works during destroy', function (t) {
+    var db = levelup('yolo', {db: leveldown});
+
+    function put(key) {
+      return new Promise(function (resolve, reject) {
+        db.put(key, key, function (err) {
+          if (err) {
+            return reject(err);
+          }
+          resolve();
+        });
+      });
+    }
+
+    Promise.resolve().then(function () {
+      var chars = 'dftmr13xn4l6wh0qsiyjkva7pu0c98obg2ez5';
+      var promises = chars.split('').map(put);
+
+      return Promise.all(promises);
+    }).then(function () {
+      return new Promise(function (resolve, reject) {
+        leveldown.destroy('yolo', function (err) {
+          if (err) {
+            return reject(err);
+          }
+          resolve();
+        });
+      });
+    }).then(function () {
+      
+      t.end();
+    }).catch(function (err) {
+      t.notOk(err, 'no error');
+    });
   });
 };
