@@ -12,7 +12,7 @@
     "leveldown",
     "levelup"
   ],
-  "version": "0.6.5",
+  "version": "0.6.6",
   "main": "lib/index.js",
   "dependencies": {
     "abstract-leveldown": "0.12.3",
@@ -67,5 +67,7 @@
   },
   "license": "MIT",
   "gypfile": false,
-  "files": ["lib"]
+  "files": [
+    "lib"
+  ]
 }
