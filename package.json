@@ -13,7 +13,7 @@
     "levelup"
   ],
   "version": "0.6.5",
-  "main": "index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "abstract-leveldown": "0.12.3",
     "argsarray": "0.0.1",
@@ -43,7 +43,7 @@
     "test": "npm run jshint && tape tests/*.js",
     "test-saucelabs": "npm run jshint && zuul --ui tape --browser-name $BROWSER_NAME --browser-version $BROWSER_VERSION tests/*.js",
     "test-zuul-local": "npm run jshint && zuul --ui tape --local tests/*.js",
-    "jshint": "jshint -c .jshintrc *.js tests/*.js",
+    "jshint": "jshint -c .jshintrc lib/*.js tests/*.js",
     "coverage": "istanbul cover ./node_modules/.bin/tape tests/*.js && istanbul check-coverage --lines 50 --function 50 --statements 50 --branches 50",
     "report-coverage": "npm run coverage && istanbul-coveralls --no-rm"
   },
@@ -66,5 +66,6 @@
     ]
   },
   "license": "MIT",
-  "gypfile": false
+  "gypfile": false,
+  "files": ["lib"]
 }
