@@ -30,7 +30,7 @@
     "jshint": "^2.5.0",
     "levelup": "^0.18.2",
     "tape": "^2.12.3",
-    "zuul": "^3.7.3"
+    "zuul": "3.8.0"
   },
   "repository": {
     "type": "git",
