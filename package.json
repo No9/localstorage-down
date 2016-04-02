@@ -30,7 +30,7 @@
     "jshint": "^2.5.0",
     "levelup": "^0.18.2",
     "tape": "^2.12.3",
-    "zuul": "3.8.0"
+    "zuul": "^3.10.1"
   },
   "repository": {
     "type": "git",
@@ -41,9 +41,9 @@
   },
   "scripts": {
     "test": "npm run jshint && tape tests/*.js",
-    "test-saucelabs": "npm run jshint && zuul --ui tape --browser-name $BROWSER_NAME --browser-version $BROWSER_VERSION tests/*.js",
-    "test-zuul-local": "npm run jshint && zuul --ui tape --local tests/*.js",
-    "jshint": "jshint -c .jshintrc lib/*.js tests/*.js",
+    "test-saucelabs": "npm run jshint && zuul --no-coverage --ui tape --browser-name $BROWSER_NAME --browser-version $BROWSER_VERSION tests/*.js",
+    "test-zuul-local": "npm run jshint && zuul --no-coverage --ui tape --local tests/*.js",
+    "jshint": "jshint -c .jshintrc *.js tests/*.js",
     "coverage": "istanbul cover ./node_modules/.bin/tape tests/*.js && istanbul check-coverage --lines 50 --function 50 --statements 50 --branches 50",
     "report-coverage": "npm run coverage && istanbul-coveralls --no-rm"
   },
