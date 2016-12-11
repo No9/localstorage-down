@@ -1,7 +1,8 @@
 'use strict';
 
 var levelup = require('levelup');
-  
+var LocalStorage = require('../lib/localstorage').LocalStorage;
+
 module.exports.setUp = function (leveldown, test, testCommon) {
   test('setUp common', testCommon.setUp);
   test('setUp db', function (t) {
@@ -227,12 +228,17 @@ module.exports.all = function (leveldown, tape, testCommon) {
     var noerr = function (err) {
       t.error(err, 'opens crrectly');
     };
-    var noop = function () {};
+    var noop = function () {
+    };
     var iterator;
     db.open(noerr);
     db.put('1', '1', noop);
     db.put('2', '2', noop);
-    iterator = db.iterator({ keyAsBuffer: false, valueAsBuffer: false, start: '1' });
+    iterator = db.iterator({
+      keyAsBuffer: false,
+      valueAsBuffer: false,
+      start: '1'
+    });
 
     var zalgoReleased = false;
     iterator.next(function (err, key, value) {
@@ -253,5 +259,46 @@ module.exports.all = function (leveldown, tape, testCommon) {
       t.ok(!zalgoReleased2, 'zalgo not released (2)');
     });
     t.ok(!zalgoReleased, 'zalgo not released (1)');
+  });
+
+  tape('bypasses getItem for keys-only db streams', function (t) {
+    var origGetItem = LocalStorage.prototype.getItem;
+    LocalStorage.prototype.getItem = function () {
+      throw new Error('shouldn\'t get called for keys-only db streams');
+    };
+
+    var db = levelup('ooga', { db: leveldown });
+    var batch = [
+      {
+        key: 'a',
+        value: '1',
+        type: 'put'
+      },
+      {
+        key: 'b',
+        value: '2',
+        type: 'put'
+      },
+      {
+        key: 'c',
+        value: '3',
+        type: 'put'
+      },
+    ];
+
+    db.batch(batch, function () {
+      db.createKeyStream({
+          start: 'c'
+        })
+        .on('data', function (key) {
+          t.equals(key, 'c');
+          db.close(function (err) {
+            t.notOk(err, 'no error');
+            // unhack getItem
+            LocalStorage.prototype.getItem = origGetItem;
+            t.end();
+          });
+        });
+    });
   });
 };
