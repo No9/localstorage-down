@@ -1,0 +1,22 @@
+ui: tape
+coverage: false
+concurrency: 2
+tunnel:
+  type: ngrok
+browsers:
+  - name: chrome
+    version: latest
+  - name: firefox
+    version: latest
+  - name: safari
+    version: [8, 9]
+  - name: ie
+    version: 9..11
+  - name: microsoftedge
+    version: latest
+  - name: iphone
+    version: 8.4
+  - name: ipad
+    version: 8.4
+  - name: android
+    version: [4.4, 5.1]

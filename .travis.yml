@@ -14,16 +14,11 @@ env:
   matrix:
   - COMMAND=test
   - COMMAND=report-coverage
-  - COMMAND=test-saucelabs BROWSER_NAME=iphone BROWSER_VERSION="8.0..latest"
-  - COMMAND=test-saucelabs BROWSER_NAME=safari BROWSER_VERSION="7..latest"
-  - COMMAND=test-saucelabs BROWSER_NAME=android BROWSER_VERSION="4.1..latest"
-  - COMMAND=test-saucelabs BROWSER_NAME=ie BROWSER_VERSION="9..latest"
-  - COMMAND=test-saucelabs BROWSER_NAME=microsoftedge BROWSER_VERSION="latest"
-  - COMMAND=test-saucelabs BROWSER_NAME=firefox BROWSER_VERSION="43..latest"
-  - COMMAND=test-saucelabs BROWSER_NAME=chrome BROWSER_VERSION="47..beta"
+  - COMMAND=test-browser
   global:
   - secure: sg7XninkGV8c95tZgZDu9dDL22TqrDKUdES+I92H+3A9vY9GZVtFpp9l5AKLLrdj7FjJ+fSsMT1XN+zE3Ljj2EpHVJqNAqo0CmNYm+lfeyI6Z50eOeuGCsjaJPiMNpeD32nghG7tIBl4JVG0hcHs+AkFtWGQoj7n+8sJXWNwE9E=
   - secure: iHZwuxZUEYRujfoDt2rZJXq0o/15j0FpJFEoV2pzhq+zUIuqbuS9vUzvE0dpfvYq+MkrIe77O2q8cRilNjw5zRZltmU6HXHKq6qRyS+vbhiXEMzm4ucvQLDHDejSq5Xrfv+yOg0z5JBzSesrP4h6l50ohvRZGtkmGXRFN/zA0Rs=
+  - secure: U2CJxbwO5HV9X7T+WnduZr4ZbcOB8tE/05q+3fi/X0zaSxgOTG7lOmngiNjnFB1lJXRS00iCE8QJ2pplrltGlcAeJLx1/fCOc5jmBbVuf0jt/qT5cKN8i87PO6SSdr7dhjwFzrqOxJ6AzMOO69nw6R7+stQaAvQCXP/Gg0szfWA=
 branches:
   only:
   - master
