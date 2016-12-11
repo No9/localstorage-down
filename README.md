@@ -93,7 +93,7 @@ This will run tests in Node against `localstorage-memory`.
 
 To test in Saucelabs, you can run e.g.:
 
-    BROWSER_NAME=firefox BROWSER_VERSION="38..latest" npm run test-saucelabs
+    npm run test-browser
 
 Or to test in Zuul locally:
 
