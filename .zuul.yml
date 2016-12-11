@@ -1,5 +1,4 @@
 ui: tape
-coverage: false
 concurrency: 2
 tunnel:
   type: ngrok

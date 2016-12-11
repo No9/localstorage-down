@@ -43,8 +43,8 @@
   },
   "scripts": {
     "test": "npm run jshint && tape tests/*.js",
-    "test-browser": "npm run jshint && zuul tests/*.js",
-    "test-zuul-local": "npm run jshint && zuul --local tests/*.js",
+    "test-browser": "npm run jshint && zuul --no-coverage tests/*.js",
+    "test-zuul-local": "npm run jshint && zuul --no-coverage --local 9000 tests/*.js",
     "jshint": "jshint -c .jshintrc lib/*.js tests/*.js",
     "coverage": "istanbul cover ./node_modules/.bin/tape tests/*.js && istanbul check-coverage --lines 50 --function 50 --statements 50 --branches 50",
     "report-coverage": "npm run coverage && istanbul-coveralls --no-rm"
